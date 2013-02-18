@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akatsuki", "Akatsuki\Akatsuki.csproj", "{CDF280C9-D0F0-4015-B806-94091A25D118}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KasumiCore", "KasumiCore\KasumiCore.csproj", "{3DDFB943-5E9F-40C8-9B46-0F54D48063E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kasumi", "Kasumi\Kasumi.csproj", "{0A681E3B-EAEB-4058-BA80-BB9E579BCBDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDF280C9-D0F0-4015-B806-94091A25D118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDF280C9-D0F0-4015-B806-94091A25D118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDF280C9-D0F0-4015-B806-94091A25D118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDF280C9-D0F0-4015-B806-94091A25D118}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DDFB943-5E9F-40C8-9B46-0F54D48063E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DDFB943-5E9F-40C8-9B46-0F54D48063E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DDFB943-5E9F-40C8-9B46-0F54D48063E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DDFB943-5E9F-40C8-9B46-0F54D48063E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A681E3B-EAEB-4058-BA80-BB9E579BCBDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A681E3B-EAEB-4058-BA80-BB9E579BCBDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A681E3B-EAEB-4058-BA80-BB9E579BCBDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A681E3B-EAEB-4058-BA80-BB9E579BCBDA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
