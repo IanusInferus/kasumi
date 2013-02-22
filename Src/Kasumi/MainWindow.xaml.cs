@@ -272,6 +272,16 @@ namespace Kasumi
                 {
                     n2.FontSize = na.FontSize.HasValue;
                 }
+                if (na.FontColor != null)
+                {
+                    var ARGB = na.FontColor.HasValue.Value;
+                    var Color = System.Windows.Media.Color.FromArgb((Byte)(ARGB.Bits(31, 24)), (Byte)(ARGB.Bits(23, 16)), (Byte)(ARGB.Bits(15, 8)), (Byte)(ARGB.Bits(7, 0)));
+                    n2.Foreground = new SolidColorBrush(Color);
+                }
+                else
+                {
+                    n2.Foreground = Brushes.Black;
+                }
                 SetChildLayout(c, n2, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 return new FrameworkElement[] { n1, n2 };
             }
@@ -288,6 +298,16 @@ namespace Kasumi
                 if (na.FontSize != null)
                 {
                     n.FontSize = na.FontSize.HasValue;
+                }
+                if (na.FontColor != null)
+                {
+                    var ARGB = na.FontColor.HasValue.Value;
+                    var Color = System.Windows.Media.Color.FromArgb((Byte)(ARGB.Bits(31, 24)), (Byte)(ARGB.Bits(23, 16)), (Byte)(ARGB.Bits(15, 8)), (Byte)(ARGB.Bits(7, 0)));
+                    n.Foreground = new SolidColorBrush(Color);
+                }
+                else
+                {
+                    n.Foreground = Brushes.Black;
                 }
                 SetChildLayout(c, n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 return new FrameworkElement[] { n };
