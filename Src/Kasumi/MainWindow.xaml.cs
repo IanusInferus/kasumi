@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -9,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Firefly;
 using Firefly.Mapping.XmlText;
@@ -190,11 +192,11 @@ namespace Kasumi
                     Canvas_Displayer.Background = Brushes.LightGray;
                     TextBox_Output.Text = "装载完成: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    DrawCanvas(Canvas_Displayer, ksm, ksm.Width, ksm.Height);
+                    DrawCanvas(Canvas_Displayer, ksm, ksm.Width, ksm.Height, KasumiFilePath);
 
                     foreach (var p in ResolutionToCanvas)
                     {
-                        DrawCanvas(p.Value, ksm, p.Key.Width, p.Key.Height);
+                        DrawCanvas(p.Value, ksm, p.Key.Width, p.Key.Height, KasumiFilePath);
                     }
                 }
                 catch (Exception ex)
@@ -208,7 +210,7 @@ namespace Kasumi
             }
         }
 
-        private static void DrawCanvas(Canvas c, UISchema.Window ksm, double Width, double Height)
+        private static void DrawCanvas(Canvas c, UISchema.Window ksm, double Width, double Height, String KasumiFilePath)
         {
             c.Children.Clear();
             var ScaleFactor = Math.Min(Width / (double)(ksm.Width), Height / (double)(ksm.Height));
@@ -223,7 +225,7 @@ namespace Kasumi
             Root.SetValue(Canvas.LeftProperty, 0.0);
             Root.SetValue(Canvas.TopProperty, 0.0);
             c.Children.Add(Root);
-            var nl = InitNode(ksm.Content, VirtualWidth, VirtualHeight);
+            var nl = InitNode(ksm.Content, VirtualWidth, VirtualHeight, KasumiFilePath);
             foreach (var n in nl)
             {
                 Root.Children.Add(n);
@@ -231,14 +233,208 @@ namespace Kasumi
             c.InvalidateVisual();
         }
 
-        private static FrameworkElement[] InitNode(UISchema.Control c, double ParentWidth, double ParentHeight)
+        private static Regex rSumImagePathExpr = new Regex(@"(?<FilePath>.*?)@(\[(?<Rectangle>\d+,\s*\d+,\s*\d+,\s*\d+)\])?\$(\[(?<Padding>\d+,\s*\d+,\s*\d+,\s*\d+)\])?", RegexOptions.ExplicitCapture);
+        private static FrameworkElement GetImage(String ImagePathExpr, String KasumiFilePath, double BoxWidth, double BoxHeight)
+        {
+            var n = new Canvas();
+
+            var SumImagePathExprs = ImagePathExpr.Split('+');
+            foreach (var SumImagePathExpr in SumImagePathExprs)
+            {
+                var m = rSumImagePathExpr.Match(SumImagePathExpr);
+                if (!m.Success)
+                {
+                    throw new InvalidOperationException("NotInvalidImagePath: {0}".Formats(SumImagePathExpr));
+                }
+                var FilePath = m.Result("${FilePath}");
+                var RectangleExpr = m.Result("${Rectangle}");
+                var PaddingExpr = m.Result("${Padding}");
+
+                var Bitmap = BitmapFrame.Create(new Uri(FileNameHandling.GetAbsolutePath(FilePath, FileNameHandling.GetFileDirectory(KasumiFilePath))));
+                Int32Rect Rect;
+                if (RectangleExpr != "")
+                {
+                    var RectValues = RectangleExpr.Split(',').Select(v => int.Parse(v.Trim(' '))).ToArray();
+                    Rect = new Int32Rect(RectValues[0], RectValues[1], RectValues[2], RectValues[3]);
+                }
+                else
+                {
+                    Rect = new Int32Rect(0, 0, Bitmap.PixelWidth, Bitmap.PixelHeight);
+                }
+                System.Windows.Thickness Padding;
+                if (PaddingExpr != "")
+                {
+                    var PaddingValues = PaddingExpr.Split(',').Select(v => int.Parse(v.Trim(' '))).ToArray();
+                    Padding = new System.Windows.Thickness(PaddingValues[0], PaddingValues[1], PaddingValues[2], PaddingValues[3]);
+                }
+                else
+                {
+                    Padding = new System.Windows.Thickness(0);
+                }
+
+                Func<double, double, double, double, Rect> CreateRelativeRect =
+                    (x, y, w, h) => new Rect(x / (double)(Bitmap.PixelWidth), y / (double)(Bitmap.PixelHeight), w / (double)(Bitmap.PixelWidth), h / (double)(Bitmap.PixelHeight));
+
+                Action<Rectangle, double, double> AddRectangle =
+                    (r, x, y) =>
+                    {
+                        r.SetValue(Canvas.LeftProperty, x - BoxWidth * 0.5);
+                        r.SetValue(Canvas.TopProperty, y - BoxHeight * 0.5);
+                        n.Children.Add(r);
+                    };
+
+                var CenterWidth = Math.Max(Rect.Width - Padding.Left - Padding.Right, 0);
+                var BoxCenterWidth = Math.Max(BoxWidth - Padding.Left - Padding.Right + 0.5, 0);
+                var CenterHeight = Math.Max(Rect.Height - Padding.Top - Padding.Bottom, 0);
+                var BoxCenterHeight = Math.Max(BoxHeight - Padding.Top - Padding.Bottom + 0.5, 0);
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X, Rect.Y, Padding.Left, Padding.Top)
+                        },
+                        Width = Padding.Left,
+                        Height = Padding.Top
+                    },
+                    0,
+                    0
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Padding.Left, Rect.Y, CenterWidth, Padding.Top)
+                        },
+                        Width = BoxCenterWidth,
+                        Height = Padding.Top
+                    },
+                    Padding.Left,
+                    0
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Rect.Width - Padding.Right, Rect.Y, Padding.Right, Padding.Top)
+                        },
+                        Width = Padding.Right,
+                        Height = Padding.Top
+                    },
+                    BoxWidth - Padding.Right,
+                    0
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X, Rect.Y + Padding.Top, Padding.Left, CenterHeight)
+                        },
+                        Width = Padding.Left,
+                        Height = BoxCenterHeight
+                    },
+                    0,
+                    Padding.Top
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Padding.Left, Rect.Y + Padding.Top, CenterWidth, CenterHeight)
+                        },
+                        Width = BoxCenterWidth,
+                        Height = BoxCenterHeight
+                    },
+                    Padding.Left,
+                    Padding.Top
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Rect.Width - Padding.Right, Rect.Y + Padding.Top, Padding.Right, CenterHeight)
+                        },
+                        Width = Padding.Right,
+                        Height = BoxCenterHeight
+                    },
+                    BoxWidth - Padding.Right,
+                    Padding.Top
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X, Rect.Y + Rect.Height - Padding.Bottom, Padding.Left, Padding.Bottom)
+                        },
+                        Width = Padding.Left,
+                        Height = Padding.Bottom
+                    },
+                    0,
+                    BoxHeight - Padding.Bottom
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Padding.Left, Rect.Y + Rect.Height - Padding.Bottom, CenterWidth, Padding.Bottom)
+                        },
+                        Width = BoxCenterWidth,
+                        Height = Padding.Bottom
+                    },
+                    Padding.Left,
+                    BoxHeight - Padding.Bottom
+                );
+                AddRectangle
+                (
+                    new Rectangle
+                    {
+                        Fill = new ImageBrush
+                        {
+                            ImageSource = Bitmap,
+                            Viewbox = CreateRelativeRect(Rect.X + Rect.Width - Padding.Right, Rect.Y + Rect.Height - Padding.Bottom, Padding.Right, Padding.Bottom)
+                        },
+                        Width = Padding.Right,
+                        Height = Padding.Bottom
+                    },
+                    BoxWidth - Padding.Right,
+                    BoxHeight - Padding.Bottom
+                );
+            }
+
+            return n;
+        }
+
+        private static FrameworkElement[] InitNode(UISchema.Control c, double ParentWidth, double ParentHeight, String KasumiFilePath)
         {
             if (c.OnGrid)
             {
                 var na = c.Grid;
                 var nc = new Canvas();
                 var n = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 3 };
-                var ActualSize = SetChildLayout(c, nc, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                var ActualSize = SetChildLayout(nc, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 n.Width = ActualSize.Width;
                 n.Height = ActualSize.Height;
                 n.SetValue(Canvas.LeftProperty, 0.0);
@@ -248,7 +444,7 @@ namespace Kasumi
                 nc.Children.Add(n);
                 foreach (var Child in na.Content)
                 {
-                    var cl = InitNode(Child, ActualSize.Width, ActualSize.Height);
+                    var cl = InitNode(Child, ActualSize.Width, ActualSize.Height, KasumiFilePath);
                     foreach (var cc in cl)
                     {
                         nc.Children.Add(cc);
@@ -259,8 +455,15 @@ namespace Kasumi
             else if (c.OnButton)
             {
                 var na = c.Button;
-                var n1 = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
-                SetChildLayout(c, n1, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                FrameworkElement n1 = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
+                SetChildLayout(n1, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                if (na.NormalImage != null)
+                {
+                    var ni = GetImage(na.NormalImage.HasValue, KasumiFilePath, n1.Width, n1.Height);
+                    ni.SetValue(Canvas.LeftProperty, n1.GetValue(Canvas.LeftProperty));
+                    ni.SetValue(Canvas.TopProperty, n1.GetValue(Canvas.TopProperty));
+                    n1 = ni;
+                }
                 var n2 = new System.Windows.Controls.Label { Content = na.Content };
                 n2.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
                 n2.VerticalContentAlignment = System.Windows.VerticalAlignment.Center;
@@ -282,7 +485,7 @@ namespace Kasumi
                 {
                     n2.Foreground = Brushes.Black;
                 }
-                SetChildLayout(c, n2, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                SetChildLayout(n2, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 return new FrameworkElement[] { n1, n2 };
             }
             else if (c.OnLabel)
@@ -309,21 +512,25 @@ namespace Kasumi
                 {
                     n.Foreground = Brushes.Black;
                 }
-                SetChildLayout(c, n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                SetChildLayout(n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 return new FrameworkElement[] { n };
             }
             else if (c.OnImage)
             {
                 var na = c.Image;
-                var n = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
-                SetChildLayout(c, n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                FrameworkElement n = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
+                SetChildLayout(n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                var ni = GetImage(na.Content, KasumiFilePath, n.Width, n.Height);
+                ni.SetValue(Canvas.LeftProperty, n.GetValue(Canvas.LeftProperty));
+                ni.SetValue(Canvas.TopProperty, n.GetValue(Canvas.TopProperty));
+                n = ni;
                 return new FrameworkElement[] { n };
             }
             else if (c.OnTextBox)
             {
                 var na = c.TextBox;
                 var n = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
-                SetChildLayout(c, n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
+                SetChildLayout(n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
                 return new FrameworkElement[] { n };
             }
             else
@@ -332,7 +539,7 @@ namespace Kasumi
             }
         }
 
-        private static Size SetChildLayout(UISchema.Control c, FrameworkElement n, Optional<UISchema.HorizontalAlignment> HorizontalAlignment, Optional<UISchema.VerticalAlignment> VerticalAlignment, Optional<UISchema.Thickness> Margin, Optional<int> Width, Optional<int> Height, double ParentWidth, double ParentHeight)
+        private static Size SetChildLayout(FrameworkElement n, Optional<UISchema.HorizontalAlignment> HorizontalAlignment, Optional<UISchema.VerticalAlignment> VerticalAlignment, Optional<UISchema.Thickness> Margin, Optional<int> Width, Optional<int> Height, double ParentWidth, double ParentHeight)
         {
             double PreferredWidth = 0;
             double PreferredHeight = 0;
@@ -424,7 +631,7 @@ namespace Kasumi
 
             SetPosition(PreferredWidth, PreferredHeight);
 
-            if (!c.OnGrid)
+            if (!(n is Panel))
             {
                 n.RenderTransform = new TranslateTransform(-PreferredWidth * 0.5, -PreferredHeight * 0.5);
                 n.SizeChanged += (sender, eArgs) =>
