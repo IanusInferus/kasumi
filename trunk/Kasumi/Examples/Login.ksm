@@ -11,7 +11,7 @@
     <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="545,476,332,96" Width="120" Height="42" Content="Login" FontSize="24" FontColor="#FFFFFF"
         NormalImage="Button.png@[0,48,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
     <Image HorizontalAlignment="Center" VerticalAlignment="Center" Margin="545,526,332,46" Width="120" Height="42"
-        Content="Button.png@[0,96,48,48]$[16,16,16,16]"></Image>
+        Content="Button.png@[0,96,48,48]$[16,16,16,16]+ButtonText.png"></Image>
     <Button Name="Button_Exit" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Width="64" Height="64" Content="退出" FontSize="24" FontColor="#FFFFFF"
         NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
     <Button Name="Button_Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Width="128" Height="128" Content="调试" FontSize="24"></Button>
