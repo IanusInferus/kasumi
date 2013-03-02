@@ -233,7 +233,7 @@ namespace Kasumi
             c.InvalidateVisual();
         }
 
-        private static Regex rSumImagePathExpr = new Regex(@"(?<FilePath>.*?)@(\[(?<Rectangle>\d+,\s*\d+,\s*\d+,\s*\d+)\])?\$(\[(?<Padding>\d+,\s*\d+,\s*\d+,\s*\d+)\])?", RegexOptions.ExplicitCapture);
+        private static Regex rSumImagePathExpr = new Regex(@"^(?<FilePath>.*?)(@\[(?<Rectangle>\d+,\s*\d+,\s*\d+,\s*\d+)\])?(\$\[(?<Padding>\d+,\s*\d+,\s*\d+,\s*\d+)\])?$", RegexOptions.ExplicitCapture);
         private static FrameworkElement GetImage(String ImagePathExpr, String KasumiFilePath, double BoxWidth, double BoxHeight)
         {
             var n = new Canvas();
