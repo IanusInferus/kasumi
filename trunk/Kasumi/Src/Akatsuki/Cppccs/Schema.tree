@@ -4,7 +4,7 @@
       File:        Schema.tree
       Location:    Kasumi.Akatsuki <Tree>
       Description: Kasumi界面结构Cocos2dx界面代码模板数据
-      Version:     2013.02.16.
+      Version:     2013.03.17.
       Copyright(C) F.R.C.
 
     ==========================================================================
@@ -69,17 +69,17 @@ ObjectSchemaTemplate
 
                     private:
                         template <typename T>
-                        static T *downcast(ControlType *n)
+                        static T downcast(ControlTypePtr n)
                         {
                             return UITemplate::template downcast<T>(n);
                         }
 
-                        static void LoadChildren(std::wstring Path, ControlType *n, std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlType *>> &v)
+                        static void LoadChildren(std::wstring Path, ControlTypePtr n, std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlTypePtr>> &v)
                         {
                             UITemplate::LoadChildren(Path, n, v);
                         }
 
-                        static void UnloadChildren(std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlType *>> &v)
+                        static void UnloadChildren(std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlTypePtr>> &v)
                         {
                             UITemplate::UnloadChildren(v);
                         }
@@ -97,7 +97,7 @@ ObjectSchemaTemplate
                             UnloadChildren();
                         }
 
-                        void LoadChildren(ControlType *Container)
+                        void LoadChildren(ControlTypePtr Container)
                         {
                             LoadChildren(L"Login.ksb", Container, v);
                             for (auto p : v)
@@ -119,20 +119,20 @@ ObjectSchemaTemplate
                         }
 
                     private:
-                        std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlType *>> v;
+                        std::vector<std::pair<std::shared_ptr<UISchema::Control>, ControlTypePtr>> v;
                     };
         Template
             Name ControlTypeDefinition
             //Parameters: ${ControlTypeName}
             Value
                 $String
-                    typedef typename [[UITemplate::${ControlTypeName}Type]] [[${ControlTypeName}Type]];
+                    typedef typename [[UITemplate::${ControlTypeName}TypePtr]] [[${ControlTypeName}TypePtr]];
         Template
             Name NamedChildDefinition
             //Parameters: ${Name}, ${ControlTypeName}
             Value
                 $String
-                    [[${ControlTypeName}Type]] *[[${Name}]];
+                    [[${ControlTypeName}TypePtr]] [[${Name}]];
         Template
             Name NamedChildInitialization
             //Parameters: ${Name}
@@ -146,7 +146,7 @@ ObjectSchemaTemplate
                 $String
                     else if (c->[[On${ControlTypeName}]]() && (c->[[${ControlTypeName}]]->Name == L"${Name}"))
                     {
-                        [[${Name}]] = downcast<[[${ControlTypeName}Type]]>(n);
+                        [[${Name}]] = downcast<[[${ControlTypeName}TypePtr]]>(n);
                     }
         Template
             Name NamedChildDestruction
