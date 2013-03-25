@@ -3,6 +3,8 @@
 修正序列化时能够在Content里看到Parent的Attribute的问题。
 修正Grid的Content为空时出错的问题。
 为Grid增加设计时才出现的标记。
+修正Akatsuki中的cocos2d-x代码生成中资源路径出错的问题。
+增加Akatsuki中的cocos2d-x代码生成传递ScaleFactor的功能。
 
 2013.03.17
 修改Akatsuki中的cocos2d-x代码生成，使得指针的形式不再受到限制。
