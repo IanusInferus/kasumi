@@ -93,6 +93,7 @@ namespace Kasumi
             }
 
             Menu_File_Open.Click += Menu_File_Open_Click;
+            Menu_File_Close.Click += Menu_File_Close_Click;
             Menu_File_Exit.Click += Menu_File_Exit_Click;
 
             AddInputBinding(new ActionCommand(() => Menu_File_Open_Click(null, null)), new KeyGesture(Key.O, ModifierKeys.Control));
@@ -158,6 +159,27 @@ namespace Kasumi
                 fsw.EnableRaisingEvents = true;
             }
         }
+        private void Menu_File_Close_Click(object sender, RoutedEventArgs e)
+        {
+            if (fsw != null)
+            {
+                fsw.EnableRaisingEvents = false;
+            }
+            Monitor.TryEnter(LoadLockee);
+            try
+            {
+                Canvas_Displayer.Children.Clear();
+                TextBox_Output.Text = "";
+                foreach (var p in ResolutionToCanvas)
+                {
+                    p.Value.Children.Clear();
+                }
+            }
+            finally
+            {
+                Monitor.Exit(LoadLockee);
+            }
+        }
 
         public void LoadFile(String KasumiFilePath)
         {
@@ -181,14 +203,8 @@ namespace Kasumi
                 try
                 {
                     var ksm = UISchema.UIXmlFile.ReadFile(KasumiFilePath);
-                    if (Double.IsNaN(Canvas_Displayer.Width))
-                    {
-                        Canvas_Displayer.Width = ksm.Width;
-                    }
-                    if (Double.IsNaN(Canvas_Displayer.Height))
-                    {
-                        Canvas_Displayer.Height = ksm.Height;
-                    }
+                    Canvas_Displayer.Width = ksm.Width;
+                    Canvas_Displayer.Height = ksm.Height;
                     Canvas_Displayer.Background = Brushes.LightGray;
                     TextBox_Output.Text = "装载完成: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
