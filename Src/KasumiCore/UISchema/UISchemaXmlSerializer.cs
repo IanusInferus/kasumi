@@ -423,7 +423,9 @@ namespace Kasumi.UISchema
                     }
                     else
                     {
-                        return Mapper(s.Parent);
+                        var x = new XElement("Dummy");
+                        x.Add(s.Parent.Elements());
+                        return Mapper(x);
                     }
                 }
 
