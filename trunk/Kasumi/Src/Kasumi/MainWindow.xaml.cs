@@ -520,10 +520,13 @@ namespace Kasumi
                 var na = c.Image;
                 FrameworkElement n = new Rectangle { Stroke = Brushes.DodgerBlue, StrokeThickness = 2 };
                 SetChildLayout(n, na.HorizontalAlignment, na.VerticalAlignment, na.Margin, na.Width, na.Height, ParentWidth, ParentHeight);
-                var ni = GetImage(na.Content, KasumiFilePath, n.Width, n.Height);
-                ni.SetValue(Canvas.LeftProperty, n.GetValue(Canvas.LeftProperty));
-                ni.SetValue(Canvas.TopProperty, n.GetValue(Canvas.TopProperty));
-                n = ni;
+                if (na.Content != "")
+                {
+                    var ni = GetImage(na.Content, KasumiFilePath, n.Width, n.Height);
+                    ni.SetValue(Canvas.LeftProperty, n.GetValue(Canvas.LeftProperty));
+                    ni.SetValue(Canvas.TopProperty, n.GetValue(Canvas.TopProperty));
+                    n = ni;
+                }
                 return new FrameworkElement[] { n };
             }
             else if (c.OnTextBox)
