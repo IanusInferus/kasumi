@@ -2,6 +2,7 @@
 修改图片没有指定路径时读取出错的问题。
 修正序列化时能够在Content里看到Parent的Attribute的问题。
 修正Grid的Content为空时出错的问题。
+为Grid增加设计时才出现的标记。
 
 2013.03.17
 修改Akatsuki中的cocos2d-x代码生成，使得指针的形式不再受到限制。

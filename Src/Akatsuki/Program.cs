@@ -3,7 +3,7 @@
 //  File:        Program.cs
 //  Location:    Kasumi.Akatsuki <Visual C#>
 //  Description: Cocos2dx界面生成工具
-//  Version:     2013.02.16.
+//  Version:     2013.03.25.
 //  Copyright(C) F.R.C.
 //
 //==========================================================================
@@ -80,6 +80,14 @@ namespace Kasumi.Akatsuki
                         var KasumiFilePath = args[0];
                         ClassName = FileNameHandling.GetMainFileName(KasumiFilePath).Replace(".", "_");
                         ksm = UIXmlFile.ReadFile(KasumiFilePath);
+                        Action<Grid> RemoveDesignerOnly = g =>
+                        {
+                            g.Content = g.Content.Where(c => !c.OnGrid || c.Grid.IsDesignOnly != true).ToList();
+                        };
+                        if (ksm.Content.OnGrid)
+                        {
+                            RemoveDesignerOnly(ksm.Content.Grid);
+                        }
                     }
                     else
                     {
