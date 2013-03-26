@@ -268,12 +268,39 @@ namespace Kasumi.UISchema
     {
         public Func<XElement, R> TranslateProjectorToProjectorDomain<R>(Func<ElementUnpackerState, R> Projector)
         {
+            var TaggedUnionInfo = typeof(R).TryGetMutableTaggedUnionInfo();
+            HashSet<String> EnumNames = null;
+            var TaggedUnionNameAndAlternativeNameDuplicated = false;
+            if (TaggedUnionInfo != null)
+            {
+                EnumNames = new HashSet<String>(TaggedUnionInfo.TagMember.Type.GetEnumNames());
+                TaggedUnionNameAndAlternativeNameDuplicated = EnumNames.Contains(typeof(R).Name);
+            }
             return Element =>
             {
                 if (!Element.IsEmpty || (Element.Attributes().Count() > 0))
                 {
-                    var l = Element.Elements().ToList();
                     var d = new Dictionary<String, XElement>(StringComparer.OrdinalIgnoreCase);
+                    var ad = new Dictionary<String, XAttribute>(StringComparer.OrdinalIgnoreCase);
+                    //如果是TaggedUnion类型，那么
+                    //若TaggedUnion类型名称和其中一个Alternative名称重复，则当前元素解释为完整的TaggedUnion
+                    //若当前元素名称不可解释为Tag，则将当前元素解释为完整的TaggedUnion
+                    //若当前元素名称可以解释为Tag，则将当前元素解释为Alternative
+                    if (TaggedUnionInfo != null)
+                    {
+                        if (!TaggedUnionNameAndAlternativeNameDuplicated && EnumNames.Contains(Element.Name.LocalName))
+                        {
+                            d.Add(Element.Name.LocalName, Element);
+                            return Projector(new ElementUnpackerState
+                            {
+                                Parent = new XElement("_Dummy_"),
+                                List = new List<XElement> { Element },
+                                Dict = d,
+                                AttributeDict = ad
+                            });
+                        }
+                    }
+                    var l = Element.Elements().ToList();
                     foreach (var e in l)
                     {
                         var LocalName = e.Name.LocalName;
@@ -282,7 +309,6 @@ namespace Kasumi.UISchema
                             d.Add(LocalName, e);
                         }
                     }
-                    var ad = new Dictionary<String, XAttribute>(StringComparer.OrdinalIgnoreCase);
                     foreach (var a in Element.Attributes())
                     {
                         var LocalName = a.Name.LocalName;
@@ -394,6 +420,12 @@ namespace Kasumi.UISchema
                     }
                 }
             }
+            var TaggedUnionInfo = typeof(R).TryGetMutableTaggedUnionInfo();
+            HashSet<String> EnumNames = null;
+            if (TaggedUnionInfo != null)
+            {
+                EnumNames = new HashSet<String>(TaggedUnionInfo.TagMember.Type.GetEnumNames());
+            }
             Func<ElementUnpackerState, R> F = (ElementUnpackerState s) =>
             {
                 var ad = s.AttributeDict;
@@ -406,7 +438,35 @@ namespace Kasumi.UISchema
                     }
                 }
                 var d = s.Dict;
-                if (d.ContainsKey(Name)) { return Mapper(d[Name]); }
+                if (d.ContainsKey(Name))
+                {
+                    //如果字段类型是TaggedUnion类型，那么
+                    //若Alternative名称中含有字段名称，则TaggedUnion的元素必须有一层Tag，且传入时会将字段名称去除
+                    //若Alternative名称中不含有字段名称，则不做特殊处理
+
+                    if (TaggedUnionInfo != null)
+                    {
+                        if (EnumNames.Contains(Name))
+                        {
+                            var r = d[Name];
+                            var x = new XElement("_Dummy_");
+                            if (r.HasAttributes)
+                            {
+                                x.Add(r.Attributes());
+                            }
+                            if (r.HasElements)
+                            {
+                                x.Add(r.Elements());
+                            }
+                            else
+                            {
+                                x.SetValue(r.Value);
+                            }
+                            return Mapper(x);
+                        }
+                    }
+                    return Mapper(d[Name]);
+                }
                 if (Name.Equals("Content"))
                 {
                     if (typeof(R) == typeof(String))
@@ -423,14 +483,15 @@ namespace Kasumi.UISchema
                     }
                     else
                     {
-                        var x = new XElement("Dummy");
-                        if (s.Parent.HasElements)
+                        var r = s.Parent;
+                        var x = new XElement("_Dummy_");
+                        if (r.HasElements)
                         {
-                            x.Add(s.Parent.Elements());
+                            x.Add(r.Elements());
                         }
                         else
                         {
-                            x.SetValue("");
+                            x.SetValue(r.Value);
                         }
                         return Mapper(x);
                     }
@@ -577,232 +638,6 @@ namespace Kasumi.UISchema
 
         private IProjectorResolver InnerResolver;
         public FieldAggregatorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-
-    public class AliasFieldProjectorResolver : IAliasFieldProjectorResolver<ElementUnpackerState>
-    {
-        private Func<ElementUnpackerState, R> Resolve<R>()
-        {
-            var Mapper = (Func<XElement, R>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(XElement), typeof(R)));
-            Func<ElementUnpackerState, R> F = (ElementUnpackerState s) => { return Mapper(s.Parent); };
-            return F;
-        }
-
-        public Delegate ResolveProjector(MemberInfo Member, Type Type)
-        {
-            var GenericMapper = (Func<Func<ElementUnpackerState, DummyType>>)Resolve<DummyType>;
-            var m = GenericMapper.MakeDelegateMethodFromDummy(Type).AdaptFunction<Delegate>();
-            return m();
-        }
-
-        private IProjectorResolver InnerResolver;
-        public AliasFieldProjectorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-    public class AliasFieldAggregatorResolver : IAliasFieldAggregatorResolver<ElementPackerState>
-    {
-        private Action<D, ElementPackerState> Resolve<D>()
-        {
-            var Mapper = (Func<D, XElement>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(D), typeof(XElement)));
-            Action<D, ElementPackerState> F = (D k, ElementPackerState s) =>
-            {
-                var e = Mapper(k);
-                s.UseParent = true;
-                s.Parent = e;
-            };
-            return F;
-        }
-
-        public Delegate ResolveAggregator(MemberInfo Member, Type Type)
-        {
-            var GenericMapper = (Func<Action<DummyType, ElementPackerState>>)Resolve<DummyType>;
-            var m = GenericMapper.MakeDelegateMethodFromDummy(Type).AdaptFunction<Delegate>();
-            return m();
-        }
-
-        private IProjectorResolver InnerResolver;
-        public AliasFieldAggregatorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-
-    public class TagProjectorResolver : ITagProjectorResolver<ElementUnpackerState>
-    {
-        private Func<ElementUnpackerState, R> Resolve<R>()
-        {
-            var Mapper = (Func<String, R>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(String), typeof(R)));
-            Func<ElementUnpackerState, R> F = (ElementUnpackerState s) =>
-            {
-                var EnumNames = typeof(R).GetEnumNames();
-                if (EnumNames.Contains(s.Parent.Name.LocalName))
-                {
-                    var TagValue2 = s.Parent.Name.LocalName;
-                    if (s.List.Count == 1)
-                    {
-                        var TagValue = s.List.Single().Name.LocalName;
-                        if (EnumNames.Contains(TagValue))
-                        {
-                            FileLocationInformation i = new FileLocationInformation();
-                            var flip = s.Parent as IFileLocationInformationProvider;
-                            if (flip != null)
-                            {
-                                i = flip.FileLocationInformation;
-                            }
-                            else
-                            {
-                                var li = (IXmlLineInfo)s.Parent;
-                                if (li.HasLineInfo())
-                                {
-                                    i.LineNumber = li.LineNumber;
-                                    i.ColumnNumber = li.LinePosition;
-                                }
-                            }
-                            throw new InvalidTextFormatException("TagNameConflict: {0}, {1}".Formats(TagValue2, TagValue), i);
-                        }
-                    }
-                    return Mapper(TagValue2);
-                }
-                else
-                {
-                    var TagValue = s.List.Single().Name.LocalName;
-                    return Mapper(TagValue);
-                }
-            };
-            return F;
-        }
-
-        public Delegate ResolveProjector(MemberInfo Member, Type TagType)
-        {
-            var GenericMapper = (Func<Func<ElementUnpackerState, DummyType>>)Resolve<DummyType>;
-            var m = GenericMapper.MakeDelegateMethodFromDummy(TagType).AdaptFunction<Delegate>();
-            return m();
-        }
-
-        private IProjectorResolver InnerResolver;
-        public TagProjectorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-    public class TagAggregatorResolver : ITagAggregatorResolver<ElementPackerState>
-    {
-        private Action<D, ElementPackerState> Resolve<D>()
-        {
-            var Mapper = (Func<D, String>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(D), typeof(String)));
-            Action<D, ElementPackerState> F = (D k, ElementPackerState s) => { };
-            return F;
-        }
-
-        public Delegate ResolveAggregator(MemberInfo Member, Type TagType)
-        {
-            var GenericMapper = (Func<Action<DummyType, ElementPackerState>>)Resolve<DummyType>;
-            var m = GenericMapper.MakeDelegateMethodFromDummy(TagType).AdaptFunction<Delegate>();
-            return m();
-        }
-
-        private IProjectorResolver InnerResolver;
-        public TagAggregatorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-
-    public class TaggedUnionAlternativeProjectorResolver : ITaggedUnionAlternativeProjectorResolver<ElementUnpackerState>
-    {
-        private Func<ElementUnpackerState, R> Resolve<R>(String Name)
-        {
-            var Mapper = (Func<XElement, R>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(XElement), typeof(R)));
-            Func<ElementUnpackerState, R> F = (ElementUnpackerState s) =>
-            {
-                var d = s.Dict;
-                if (d.ContainsKey(Name)) { return Mapper(d[Name]); }
-
-                if (s.Parent.Name.LocalName.Equals(Name)) { return Mapper(s.Parent); }
-
-                FileLocationInformation i = new FileLocationInformation();
-                var flip = s.Parent as IFileLocationInformationProvider;
-                if (flip != null)
-                {
-                    i = flip.FileLocationInformation;
-                }
-                else
-                {
-                    var li = (IXmlLineInfo)s.Parent;
-                    if (li.HasLineInfo())
-                    {
-                        i.LineNumber = li.LineNumber;
-                        i.ColumnNumber = li.LinePosition;
-                    }
-                }
-                throw new InvalidTextFormatException("AlternativeNameNotFound: {0}".Formats(Name), i);
-            };
-            return F;
-        }
-
-        private Dictionary<Type, Func<String, Delegate>> Dict = new Dictionary<Type, Func<String, Delegate>>();
-        public Delegate ResolveProjector(MemberInfo Member, Type Type)
-        {
-            var Name = Member.Name;
-            if (Dict.ContainsKey(Type))
-            {
-                var m = Dict[Type];
-                return m(Name);
-            }
-            else
-            {
-                var GenericMapper = (Func<String, Func<ElementUnpackerState, DummyType>>)Resolve<DummyType>;
-                var m = GenericMapper.MakeDelegateMethodFromDummy(Type).AdaptFunction<String, Delegate>();
-                Dict.Add(Type, m);
-                return m(Name);
-            }
-        }
-
-        private IProjectorResolver InnerResolver;
-        public TaggedUnionAlternativeProjectorResolver(IProjectorResolver Resolver)
-        {
-            this.InnerResolver = Resolver;
-        }
-    }
-    public class TaggedUnionAlternativeAggregatorResolver : ITaggedUnionAlternativeAggregatorResolver<ElementPackerState>
-    {
-        private Action<D, ElementPackerState> Resolve<D>(String Name)
-        {
-            var Mapper = (Func<D, XElement>)InnerResolver.ResolveProjector(CollectionOperations.CreatePair(typeof(D), typeof(XElement)));
-            Action<D, ElementPackerState> F = (D k, ElementPackerState s) =>
-            {
-                var e = Mapper(k);
-                e.Name = Name;
-                s.List.Add(e);
-            };
-            return F;
-        }
-
-        private Dictionary<Type, Func<String, Delegate>> Dict = new Dictionary<Type, Func<String, Delegate>>();
-        public Delegate ResolveAggregator(MemberInfo Member, Type Type)
-        {
-            var Name = Member.Name;
-            if (Dict.ContainsKey(Type))
-            {
-                var m = Dict[Type];
-                return m(Name);
-            }
-            else
-            {
-                var GenericMapper = (Func<String, Action<DummyType, ElementPackerState>>)Resolve<DummyType>;
-                var m = GenericMapper.MakeDelegateMethodFromDummy(Type).AdaptFunction<String, Delegate>();
-                Dict.Add(Type, m);
-                return m(Name);
-            }
-        }
-
-        private IProjectorResolver InnerResolver;
-        public TaggedUnionAlternativeAggregatorResolver(IProjectorResolver Resolver)
         {
             this.InnerResolver = Resolver;
         }
