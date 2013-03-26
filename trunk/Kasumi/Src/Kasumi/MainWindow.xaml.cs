@@ -168,6 +168,7 @@ namespace Kasumi
             Monitor.TryEnter(LoadLockee);
             try
             {
+                this.Title = "Kasumi";
                 Canvas_Displayer.Children.Clear();
                 TextBox_Output.Text = "";
                 foreach (var p in ResolutionToCanvas)
@@ -200,6 +201,7 @@ namespace Kasumi
         {
             if (Monitor.TryEnter(LoadLockee))
             {
+                this.Title = "Kasumi - " + KasumiFilePath;
                 try
                 {
                     var ksm = UISchema.UIXmlFile.ReadFile(KasumiFilePath);
