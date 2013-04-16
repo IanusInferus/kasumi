@@ -3,7 +3,7 @@
 //  File:        CodeGenerator.cs
 //  Location:    Kasumi.Akatsuki <Visual C#>
 //  Description: Kasumi界面结构Cocos2dx界面代码生成器
-//  Version:     2013.02.16.
+//  Version:     2013.04.16.
 //  Copyright(C) F.R.C.
 //
 //==========================================================================
@@ -207,15 +207,15 @@ namespace Kasumi.Akatsuki
             }
             public String[] GetLines(String Value)
             {
-                return Value.UnifyNewLineToLf().Split('\n');
+                return Yuki.ObjectSchema.Cpp.Common.CodeGenerator.Writer.GetLines(Value);
             }
             public String GetEscapedIdentifier(String Identifier)
             {
-                return InnerWriter.GetEscapedIdentifier(Identifier);
+                return Yuki.ObjectSchema.Cpp.Common.CodeGenerator.Writer.GetEscapedIdentifier(Identifier);
             }
             private String[] EvaluateEscapedIdentifiers(String[] Lines)
             {
-                return InnerWriter.EvaluateEscapedIdentifiers(Lines);
+                return Yuki.ObjectSchema.Cpp.Common.CodeGenerator.Writer.EvaluateEscapedIdentifiers(Lines);
             }
         }
 
