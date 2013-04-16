@@ -32,8 +32,6 @@ namespace Kasumi.Akatsuki
         {
             private static ObjectSchemaTemplateInfo TemplateInfo;
 
-            private Yuki.ObjectSchema.Cpp.Common.CodeGenerator.Writer InnerWriter;
-
             private Window ksm;
             private String ClassName;
             private String NamespaceName;
@@ -57,8 +55,6 @@ namespace Kasumi.Akatsuki
 
             public String[] GetSchema()
             {
-                InnerWriter = new Yuki.ObjectSchema.Cpp.Common.CodeGenerator.Writer(new Yuki.ObjectSchema.Schema { Types = { }, TypeRefs = { }, TypePaths = { }, Imports = { } }, NamespaceName);
-
                 var Header = GetHeader();
                 var Includes = this.Imports.Where(i => IsInclude(i)).ToArray();
                 var Imports = this.Imports.Where(i => !IsInclude(i)).ToArray();
