@@ -4,7 +4,7 @@
       File:        Schema.tree
       Location:    Kasumi.Akatsuki <Tree>
       Description: Kasumi界面结构Cocos2dx界面代码模板数据
-      Version:     2013.03.25.
+      Version:     2013.04.18.
       Copyright(C) F.R.C.
 
     ==========================================================================
@@ -17,12 +17,11 @@ ObjectSchemaTemplate
     Templates
         Template
             Name Main
-            //Parameters: ${Header}, ${Imports}, ${Includes}, ${Contents}
+            //Parameters: ${Header}, ${Includes}, ${Contents}
             Value
                 $String
                     ${Header}
                     #include ${Includes}
-                    using namespace ${Imports};
 
                     ${Contents}
 

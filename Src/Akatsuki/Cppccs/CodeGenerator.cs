@@ -3,7 +3,7 @@
 //  File:        CodeGenerator.cs
 //  Location:    Kasumi.Akatsuki <Visual C#>
 //  Description: Kasumi界面结构Cocos2dx界面代码生成器
-//  Version:     2013.04.16.
+//  Version:     2013.04.18.
 //  Copyright(C) F.R.C.
 //
 //==========================================================================
@@ -57,7 +57,6 @@ namespace Kasumi.Akatsuki
             {
                 var Header = GetHeader();
                 var Includes = this.Imports.Where(i => IsInclude(i)).ToArray();
-                var Imports = this.Imports.Where(i => !IsInclude(i)).ToArray();
                 var ComplexTypes = GetComplexTypes(ksm);
                 var Contents = ComplexTypes;
                 if (NamespaceName != "")
@@ -67,7 +66,7 @@ namespace Kasumi.Akatsuki
                         Contents = GetTemplate("Namespace").Substitute("NamespaceName", nn).Substitute("Contents", Contents);
                     }
                 }
-                return EvaluateEscapedIdentifiers(GetTemplate("Main").Substitute("Header", Header).Substitute("Includes", Includes).Substitute("Imports", Imports).Substitute("Contents", Contents)).Select(Line => Line.TrimEnd(' ')).ToArray();
+                return EvaluateEscapedIdentifiers(GetTemplate("Main").Substitute("Header", Header).Substitute("Includes", Includes).Substitute("Contents", Contents)).Select(Line => Line.TrimEnd(' ')).ToArray();
             }
 
             public Boolean IsInclude(String s)
