@@ -1,4 +1,7 @@
-﻿2013.04.18
+﻿2013.04.27.0
+修正Firefly和YUKI强名称问题。
+
+2013.04.18
 升级YUKI。
 去除using namespace。
 
