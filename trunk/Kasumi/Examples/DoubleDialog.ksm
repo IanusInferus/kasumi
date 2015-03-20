@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window Width="960" Height="640">
+  <Grid Name="Grid_Root">
+    <Grid Name="Grid_Left" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,40,500,40" Width="420" Height="560"></Grid>
+    <Grid Name="Grid_Right" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="500,40,40,40" Width="420" Height="560"></Grid>
+  </Grid>
+</Window>
