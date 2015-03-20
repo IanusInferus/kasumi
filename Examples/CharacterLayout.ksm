@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window Width="420" Height="560">
+  <Grid Name="Grid_Root">
+    <Grid IsDesignOnly="True">
+      <Image Content="DialogBackground.png$[16,16,16,16]" Margin="-8,-8,-8,-8"></Image>
+      <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-32,-32,0" Width="64" Height="64"
+          NormalImage="btnClose1.png" HitImage="btnClose2.png" DisabledImage="btnClose2.png"></Button>
+    </Grid>
+    <Button Name="Button_Necklace" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,30,0,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Button Name="Button_Weapon" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,130,0,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Button Name="Button_Ring" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,230,0,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Button Name="Button_Headwear" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,30,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Button Name="Button_Dress" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,130,30,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Button Name="Button_Boot" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,230,30,0" Width="80" Height="80"
+        NormalImage="Item.png" HitImage="Item_Hit.png"></Button>
+    <Label Name="Label_Name" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,30,0,0" FontColor="#FFFFFF" FontSize="24">最多五个字</Label>
+    <Label Name="Label_TypeAndLevel" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,60,0,0" FontColor="#FFFFFF" FontSize="20">剑侠 Lv999</Label>
+    <Grid Name="Grid_Character" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,90,0,0" Width="140" Height="220"></Grid>
+    <Grid Name="Grid_Experience" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,330,0,0" Width="360" Height="30">
+      <Image>Experience_Background.png</Image>
+      <Image Name="Grid_Experience_Foreground" HorizontalAlignment="Left" Width="180">Experience_Foreground.png</Image>
+    </Grid>
+    <Label Name="Label_Experience" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,330,0,0" FontColor="#FFFFFF" FontSize="20">Exp: 999999999/999999999</Label>
+    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,360,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">生命</Label>
+    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,390,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">物攻</Label>
+    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,420,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">法攻</Label>
+    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="30,450,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">技攻</Label>
+    <Label Name="Label_Health" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="110,360,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Label Name="Label_PhysicalAttack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="110,390,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Label Name="Label_MagicalAttack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="110,420,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Label Name="Label_SkillAttack" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="110,450,0,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Grid Name="Grid_Toughness">
+        <Label HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,360,110,0" Width="80" FontColor="#FFFFFF" FontSize="20">历练</Label>
+        <Label Name="Label_Toughness" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,360,30,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    </Grid>
+    <Label HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,390,110,0" Width="80" FontColor="#FFFFFF" FontSize="20">物防</Label>
+    <Label HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,420,110,0" Width="80" FontColor="#FFFFFF" FontSize="20">法防</Label>
+    <Label HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,450,110,0" Width="80" FontColor="#FFFFFF" FontSize="20">技防</Label>
+    <Label Name="Label_PhysicalDefend" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,390,30,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Label Name="Label_MagicalDefend" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,420,30,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Label Name="Label_SkillDefend" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,450,30,0" Width="80" FontColor="#FFFFFF" FontSize="20">99999</Label>
+    <Button Name="Button_Detail" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,30" Width="100" Height="48" FontSize="24" FontColor="#FFFFFF"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]">详细</Button>
+    <Button Name="Button_Backpack" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,30,30" Width="100" Height="48" FontSize="24" FontColor="#FFFFFF"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]">背包</Button>
+    <Button Name="Button_ScrollLeft" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0" Width="20" Height="93"
+        NormalImage="ScrollLeft.png" />
+    <Button Name="Button_ScrollRight" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,0" Width="20" Height="93"
+        NormalImage="ScrollRight.png" />
+  </Grid>
+</Window>

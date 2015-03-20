@@ -1,21 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Window Width="960" Height="640">
-  <Grid>
+  <Grid Name="Grid_Root">
     <Label HorizontalAlignment="Center" VerticalAlignment="Center" Margin="435,110,435,442" Content="登陆" FontSize="36" FontColor="#FF0000"></Label>
     <Label HorizontalAlignment="Center" VerticalAlignment="Center" Margin="230,230,664,338" Content="账号" FontSize="24" FontColor="#FF0000"></Label>
     <Label HorizontalAlignment="Center" VerticalAlignment="Center" Margin="230,350,664,218" Content="密码" FontSize="24" FontColor="#FF0000"></Label>
-    <TextBox Name="TextBox_Login" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="418,230,230,338" Width="304" Height="42" Content="" FontSize="24"></TextBox>
+    <TextBox Name="TextBox_Name" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="418,230,230,338" Width="304" Height="42" Content="" FontSize="24"></TextBox>
     <TextBox Name="TextBox_Password" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="418,350,230,218" Width="304" Height="42" Content="" FontSize="24"></TextBox>
-    <Button Name="Button_Login" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="435,476,442,96" Width="75" Height="42" Content="登录" FontSize="24" FontColor="#FFFFFF"
+    <Label Name="Label_Info" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="435,416,435,156" Content="" FontSize="36" FontColor="#FF0000"></Label>
+    <Button Name="Button_Login" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="425,476,420,96" Width="128" Height="48" Content="登录游戏" FontSize="24" FontColor="#FFFFFF"
         NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
-    <Button HorizontalAlignment="Center" VerticalAlignment="Center" Margin="545,476,332,96" Width="120" Height="42" Content="Login" FontSize="24" FontColor="#FFFFFF"
-        NormalImage="Button.png@[0,48,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
-    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Margin="545,526,332,46" Width="120" Height="42"
+    <Button Name="Button_LoginAndStay" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="425,526,420,46" Width="128" Height="48" Content="登录" FontSize="24" FontColor="#FFFFFF"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
+    <Button Name="Button_ChangeBackground" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="575,476,302,96" Width="128" Height="48" Content="更换背景" FontSize="24" FontColor="#FFFFFF"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
+    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Margin="575,526,302,46" Width="128" Height="48"
         Content="Button.png@[0,96,48,48]$[16,16,16,16]+ButtonText.png"></Image>
-    <Button Name="Button_Exit" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Width="64" Height="64" Content="退出" FontSize="24" FontColor="#FFFFFF"
+    <Button Name="Button_Exit" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,20,20" Width="96" Height="64" Content="退出" FontSize="24" FontColor="#FFFFFF"
         NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
-    <Button Name="Button_Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Width="128" Height="128" Content="调试" FontSize="24"></Button>
     <Label HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="20,0,0,20" Content="左下角" FontSize="24" FontColor="#FFFFFF"></Label>
     <Label HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0" Content="右上角" FontSize="24" FontColor="#FFFFFF"></Label>
+    <Button Name="Button_Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0" Width="128" Height="128" Content="调试" FontSize="24" FontColor="#FF0000"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
+    <Button Name="Button_Castle" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,150,0,0" Width="128" Height="128" Content="主城" FontSize="24" FontColor="#FF0000"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
+    <Button Name="Button_Character" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,280,0,0" Width="128" Height="128" Content="角色" FontSize="24" FontColor="#FF0000"
+        NormalImage="Button.png@[0,0,48,48]$[16,16,16,16]" HitImage="Button.png@[0,48,48,48]$[16,16,16,16]" DisabledImage="Button.png@[0,96,48,48]$[16,16,16,16]"></Button>
   </Grid>
 </Window>
